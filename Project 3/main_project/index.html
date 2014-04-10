@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>New Rise</title>
+<link href="style.css" rel="stylesheet" type="text/css" />
+	<!-- link calendar resources -->
+<link rel="stylesheet" type="text/css" href="tcal.css" />
+<script type="text/javascript" src="tcal.js"></script> 
+
+</head>
+<body>
+<!--header start -->
+<div id="header">
+<a href="#" class="member">Home</a>
+<img src="images/broadway2.jpg" alt="web development" width="300" height="50" border="0" class="banner" />
+<ul class="nav">
+<li class="home">home</li>
+<li><a href="#">contact</a></li>
+</ul>
+</div>
+<!--header end -->
+<!--body start -->
+<div id="body">
+<p class="top"></p>
+<!--left panel start -->
+<div id="left">
+<h2>Welcome</h2>
+<img src="images/broadway_show.jpg" alt="banner" width="400" height="400" border="0" class="banner" />
+<h2>latest events</h2>
+<h3 class="date">On 19 December 2013</h3>
+<p class="event"><b>Your Turn, Heather! Tickets Now Available for the Off-Broadway Premiere of Heathers the Musical</b> </br>
+                   Tickets are now on sale for Heathers the Musical. The musical adaptation of the cult film features a book, music and lyrics by Tony nominee Laurence O'Keefe (Legally Blonde) 
+				   and Emmy winner Kevin Murphy (Reefer Madness). Heathers the Musical will begin performances March 17 at New World World Stages, with opening night is set for March 31.</p>
+<p class="rm2"><a href="#"></a></p>
+</br>
+<h3 class="date">On 19 December 2013</h3>
+<p class="event"><b>Conor McPherson's The Night Alive, Starring Ciaran Hinds & Jim Norton, Extends Off-Broadway</b> </br>
+                   This Night isn't coming to an end just yet! Atlantic Theater Company's American premiere presentation of Conor McPherson's The Night Alive has extended its off-Broadway run at the Linda Gross Theatre through February 2, 2014.</p>
+<p class="rm2"><a href="#"></a></p>
+</div>
+<!--left panel end -->
+
+<!--right panel start -->
+<div id="right">
+<h2>Search Artist</h2>
+<form name="artist_search" action="get_artist.php" method="post">
+<p class="domain">enter the artist name</p>
+<input type="text" name="name" />
+<input type="submit" name="go" value="" class="go" />
+<p >Hint: try 'Rafe Spall' or 'Laurie Veldheer' without quote</p>
+</form>
+
+<form name="submit_search" action="getname.php" method="post">
+<ul>
+   <h2 class="Type_text">Select Type</h2>
+<li>
+    <select id="show_type" name="show_type"> 
+        <option selected value="*">None</option> 
+        <option value="Musical">Musical</option>
+        <option value="Comedy">Comedy</option>
+		<option value="Tragedy">Tragedy</option>
+        <option value="Play">Play</option>
+		<option value="Kids-friendly">Kids-friendly</option>
+		<option value="History">History</option>
+		<option value="Classics">Classics</option>
+    </select>
+</li>
+    <h2 class="Type_text">Select Score</h2>
+<li>
+    <select id="show_score" name="show_score"> 
+        <option selected value=0>None</option> 
+        <option value=80>>80
+        <option value=85>>85
+        <option value=90>>90
+		<option value=95>>95
+    </select>
+</li>
+    <h2 class="Type_text">Select Price</h2>
+<li>
+    <select id="show_price" name="show_price"> 
+        <option selected value=0>None</option> 
+        <option value=100.0><100
+        <option value=150.0><150
+        <option value=200.0><200
+		<option value=200.0>>200
+    </select>
+</li>
+    <h2 class="Type_text">Select Theatre</h2>
+<li>
+    <select id="show_location" name="show_location"> 
+        <option selected value="*">None</option> 
+        <option value="Minskoff Th">Minskoff Th
+        <option value="August Wils">August Wils
+        <option value="Gershwin Th">Gershwin Th
+		<option value="Bernard B.">Bernard B.
+		<option value="Longacre Th">Longacre Th
+		<option value="Broadhurst ">Broadhurst 
+		<option value="Ambassador">Ambassador
+	    <option value="Belasco Th">Belasco Th
+		<option value="Walter Ker">Walter Ker
+    </select>
+</li>
+    <h2 class="Type_text">Select Seat</h2>
+<li>
+    <select id="seat_location" name="seat_location"> 
+        <option selected value="*">None</option> 
+        <option value="Orchestra">Orchestra
+        <option value="Front Mezzanine">Front Mezzanine
+        <option value="Rear Mezzanine">Rear Mezzanine
+    </select>
+</li>
+
+    <h2 class="Type_text">Select Date</h2>
+<li>
+		<!-- add class="tcal" to your input field -->
+		<div><input type="text" name="date" class="tcal" value="" /></div>
+</li>
+</ul>
+<input class="classname" type="submit" name="submit" value="Search" />
+<p >Hint: try only Type</p>
+<p >Hint: try only Score</p>
+<p >Hint: try only Price</p>
+<p >Hint: try Type:'musical', Score:85, Price:>200, Theater:'Minskoff Th', Seat:'Rear Mezzanine', Date:'2013-12-27'</p>
+</form >
+
+<a href="login.html"><input class="classname" type="submit" name="login" value="Login" /></a>
+<br></br>
+<a href="signup.html"><input class="classname" type="submit" name="signup" value="Sign Up" /></a>
+
+</p>
+</div>
+<!--right panel end -->
+<p class="bot"></p>
+<br class="spacer" />
+</div>
+<!--body end -->
+</body>
+</html>
