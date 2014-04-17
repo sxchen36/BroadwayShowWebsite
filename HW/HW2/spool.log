@@ -1,0 +1,932 @@
+--------------
+SELECT fname, lname, S1.major, age
+FROM Student AS S1 INNER JOIN
+     (SELECT major AS major, min(age) AS Youngest_Age
+      FROM Student
+      GROUP BY major) AS S2 ON S1.age = S2.Youngest_Age
+WHERE S1.major = S2.major
+--------------
+
++---------+---------+-------+------+
+| fname   | lname   | major | age  |
++---------+---------+-------+------+
+| Susan   | Lee     |   600 |   16 |
+| Michael | Woods   |   540 |   17 |
+| Mark    | Goldman |   520 |   18 |
+| Paul    | Brody   |   520 |   18 |
+| Jun     | Han     |   100 |   17 |
+| William | Simms   |   550 |   18 |
+| Eric    | Epp     |    50 |   18 |
++---------+---------+-------+------+
+--------------
+SELECT S.stuid, fname, lname, major, sex, grade
+FROM Student AS S INNER JOIN Enrolled_in AS E ON S.stuid = E.stuid
+WHERE NOT EXISTS (
+    SELECT StuID
+    FROM Enrolled_in AS E1 INNER JOIN Course AS C ON E1.cid = C.cid
+    WHERE C.cname= 'Algorithms I' AND
+    E1.stuid NOT IN (
+        SELECT L.WhoIsLiked
+        FROM Likes AS L
+        WHERE L.wholikes = S.stuid))
+--------------
+
++-------+---------+-------+-------+------+-------+
+| stuid | fname   | lname | major | sex  | grade |
++-------+---------+-------+-------+------+-------+
+|  1033 | William | Simms |   550 | M    | A     |
+|  1033 | William | Simms |   550 | M    | A     |
+|  1033 | William | Simms |   550 | M    | A     |
+|  1033 | William | Simms |   550 | M    | A     |
+|  1033 | William | Simms |   550 | M    | B     |
++-------+---------+-------+-------+------+-------+
+--------------
+SELECT C1.cname, S1.fname, S1.lname, S1.major, E1.grade, S2.fname, S2.lname, S2.major, E2.grade
+FROM Student AS S1 
+INNER JOIN Loves AS L1 ON S1.stuid = L1.wholoves 
+INNER JOIN Enrolled_in AS E1 ON S1.stuid = E1.stuid
+INNER JOIN Course AS C1 ON E1.cid = C1.cid
+INNER JOIN Student AS S2 ON S2.stuid = L1.whoisloved
+INNER JOIN Enrolled_in AS E2 ON S2.stuid = E2.stuid
+INNER JOIN Course AS C2 ON E2.cid = C2.cid
+INNER JOIN Loves AS L2 ON S2.stuid = L2.wholoves
+WHERE L2.whoisloved = L1.wholoves AND C1.cid = C2.cid
+--------------
+
++-----------------------------+---------+--------+-------+-------+---------+--------+-------+-------+
+| cname                       | fname   | lname  | major | grade | fname   | lname  | major | grade |
++-----------------------------+---------+--------+-------+-------+---------+--------+-------+-------+
+| DATABASE SYSTEMS            | Charles | Norris |   600 | A+    | Linda   | Smith  |   600 | B+    |
+| COMPUTER VISION             | Charles | Norris |   600 | B     | Linda   | Smith  |   600 | B-    |
+| INTRODUCTION TO PROBABILITY | Susan   | Lee    |   600 | A     | Derek   | Lee    |   600 | A     |
+| DATABASE SYSTEMS            | Linda   | Smith  |   600 | B+    | Charles | Norris |   600 | A+    |
+| COMPUTER VISION             | Linda   | Smith  |   600 | B-    | Charles | Norris |   600 | B     |
+| INTRODUCTION TO PROBABILITY | Derek   | Lee    |   600 | A     | Susan   | Lee    |   600 | A     |
++-----------------------------+---------+--------+-------+-------+---------+--------+-------+-------+
+--------------
+SELECT lname, T
+FROM (SELECT lname, COUNT(stuid) AS T
+  FROM Student
+  WHERE sex = 'F'
+  GROUP BY lname) AS A1
+ORDER BY T DESC LIMIT 0,1
+--------------
+
++-------+---+
+| lname | T |
++-------+---+
+| Smith | 2 |
++-------+---+
+--------------
+SELECT S1.fname as Name1F, S1.lname as Name1L, S2.fname as Name2F, S2.lname as Name2L, S3.fname as Name3F, S3.lname as Name3L
+FROM Student AS S1 
+INNER JOIN Loves AS L1 ON S1.stuid = L1.wholoves 
+INNER JOIN Student AS S2 ON S2.stuid = L1.whoisloved
+INNER JOIN Loves AS L2 ON S2.stuid = L2.wholoves
+INNER JOIN Student AS S3 ON S3.stuid = L2.whoisloved
+INNER JOIN Loves AS L3 ON S3.stuid = L3.wholoves
+WHERE L3.whoisloved = L1.wholoves
+--------------
+
+--------------
+SELECT fname, lname, S1.major, age
+FROM Student AS S1 INNER JOIN
+     (SELECT major AS major, min(age) AS Youngest_Age
+      FROM Student
+      GROUP BY major) AS S2 ON S1.age = S2.Youngest_Age
+WHERE S1.major = S2.major
+--------------
+
++---------+---------+-------+------+
+| fname   | lname   | major | age  |
++---------+---------+-------+------+
+| Susan   | Lee     |   600 |   16 |
+| Michael | Woods   |   540 |   17 |
+| Mark    | Goldman |   520 |   18 |
+| Paul    | Brody   |   520 |   18 |
+| Jun     | Han     |   100 |   17 |
+| William | Simms   |   550 |   18 |
+| Eric    | Epp     |    50 |   18 |
++---------+---------+-------+------+
+--------------
+SELECT fname, T
+FROM (SELECT fname, COUNT(stuid) AS T
+  FROM Student
+  WHERE Sex = 'F'
+  GROUP BY fname) AS A1
+ORDER BY T DESC LIMIT 0,1
+--------------
+
++-------+---+
+| fname | T |
++-------+---+
+| Lisa  | 2 |
++-------+---+
+--------------
+SELECT DISTINCT fname, lname, major, advisor
+FROM Student AS S0 INNER JOIN Enrolled_in AS E0 ON S0.stuid = E0.stuid
+                   INNER JOIN (SELECT AVG(age) AS avgAge, E.cid
+                               FROM Student AS S INNER JOIN Enrolled_in AS E ON S.stuid= E.stuid
+                               GROUP BY E.cid) AS T1
+                   ON E0.cid = T1.cid
+WHERE S0.age < T1.avgAge
+--------------
+
++---------+----------+-------+---------+
+| fname   | lname    | major | advisor |
++---------+----------+-------+---------+
+| Linda   | Smith    |   600 |    1121 |
+| Tracy   | Kim      |   600 |    7712 |
+| Dinesh  | Kumar    |   600 |    8423 |
+| Andy    | Schultz  |   600 |    1148 |
+| Lisa    | Apap     |   600 |    8918 |
+| Jandy   | Nelson   |   600 |    9172 |
+| Eric    | Tai      |   600 |    2192 |
+| Derek   | Lee      |   600 |    2192 |
+| Charles | Norris   |   600 |    8741 |
+| Susan   | Lee      |   600 |    8721 |
+| Mark    | Schwartz |   600 |    2192 |
+| Michael | Leighton |   600 |    1121 |
+| Arthur  | Pang     |   600 |    2192 |
+| George  | Andreou  |   520 |    8722 |
+| Michael | Woods    |   540 |    8722 |
+| David   | Shieber  |   520 |    8722 |
+| Stacy   | Prater   |   540 |    7271 |
+| Mark    | Goldman  |   520 |    7134 |
+| Eric    | Pang     |   520 |    7134 |
+| Paul    | Brody    |   520 |    8723 |
+| Jun     | Han      |   100 |    2311 |
+| Sarah   | Smith    |   550 |    8772 |
+| William | Simms    |   550 |    8772 |
+| Eric    | Epp      |    50 |    5718 |
+| Sarah   | Schmidt  |    50 |    5718 |
++---------+----------+-------+---------+
+--------------
+SELECT T2.dname, T2.C2
+FROM  (SELECT D1.dname, COUNT(S1.stuid) AS C1
+      FROM Student AS S1 INNER JOIN Department AS D1 ON S1.major = D1.dno INNER JOIN Minor_in AS M1 ON S1.stuid = M1.stuid INNER JOIN Department AS D11 ON D11.dno = M1.dno
+      WHERE (D1.dname = 'Computer Science' OR D1.dname = 'Mathematical Sciences')
+      GROUP BY M1.dno
+      ORDER BY C1 DESC LIMIT 0,1) AS T1 
+      INNER JOIN 
+      (SELECT D2.dname, COUNT(S2.stuid) AS C2
+      FROM Student AS S2 INNER JOIN Department AS D2 ON S2.major = D2.dno INNER JOIN Minor_in AS M2 ON S2.stuid = M2.stuid INNER JOIN Department AS D22 ON D22.dno = M2.dno
+      WHERE (D2.dname = 'Computer Science' OR D2.dname = 'Mathematical Sciences')
+      GROUP BY M2.dno
+      ) AS T2 
+      ON T1.C1 = T2.C2
+--------------
+
++------------------+----+
+| dname            | C2 |
++------------------+----+
+| Computer Science |  2 |
+| Computer Science |  2 |
++------------------+----+
+--------------
+SELECT DISTINCT S1.stuid AS Name1, S2.stuid AS Name2
+FROM Student AS S1 INNER JOIN Preferences AS P1 ON S1.stuid= P1.stuid INNER JOIN Lives_in AS L1 ON L1.stuid = S1.stuid
+                   INNER JOIN Lives_in AS L2 ON L2.dormid = L1.dormid AND L2.room_number = L1.room_number
+                   INNER JOIN Student AS S2 ON S2.stuid = L2.stuid
+                   INNER JOIN Preferences AS P2 ON P2.stuid = S2.stuid
+WHERE ((P1.SleepHabits <> P2.SleepHabits or
+       P1.MusicType <> P2.MusicType) and
+       P1.stuid > P2.stuid) or
+      (P1.Smoking = 'Yes' and P2.Smoking = 'no-accept')
+--------------
+
++-------+-------+
+| Name1 | Name2 |
++-------+-------+
+|  1032 |  1001 |
+|  1031 |  1002 |
+|  1035 |  1003 |
+|  1012 |  1005 |
+|  1009 |  1005 |
+|  1021 |  1020 |
+|  1025 |  1023 |
+|  1008 |  1003 |
+|  1012 |  1009 |
++-------+-------+
+--------------
+SELECT DISTINCT fname, lname 
+FROM 
+  (SELECT S.stuid, SUM(gradepoint)/COUNT(E.stuid) AS GPA
+  FROM Student AS S, Enrolled_in AS E, Gradeconversion AS GC
+  WHERE S.stuid = E.stuid and E.grade = GC.lettergrade
+  GROUP BY S.stuid
+  HAVING GPA >= 3.3) AS T1 
+  INNER JOIN Student ON T1.stuid = Student.stuid 
+  INNER JOIN Enrolled_in ON Student.stuid = Enrolled_in.stuid
+  WHERE Grade = 'A'
+--------------
+
++---------+----------+
+| fname   | lname    |
++---------+----------+
+| Derek   | Lee      |
+| David   | Adams    |
+| Charles | Norris   |
+| Susan   | Lee      |
+| Ian     | Thornton |
+| David   | Shieber  |
+| Mark    | Goldman  |
+| Eric    | Pang     |
+| Eric    | Rugh     |
+| William | Simms    |
++---------+----------+
+--------------
+SELECT T1.fname, T1.lname, T1.PeopleTheyLike, T2.PeopleLikeThem, (T1.PeopleTheyLike - T2.PeopleLikeThem) AS difference
+FROM
+  (SELECT S1.fname AS fname, S1.lname AS lname, COUNT(L1.whoisliked) AS PeopleTheyLike
+  FROM Student AS S1 INNER JOIN Likes AS L1 ON S1.stuid = L1.wholikes
+  GROUP BY S1.stuid) AS T1
+  INNER JOIN
+  (SELECT S2.fname AS fname, S2.lname AS lname, COUNT(L2.wholikes) AS PeopleLikeThem
+  FROM Student AS S2 INNER JOIN Likes AS L2 ON S2.stuid = L2.whoisliked
+  GROUP BY S2.stuid) AS T2
+  ON T1.fname = T2.fname and T1.lname = T2.lname
+--------------
+
++---------+----------+----------------+----------------+------------+
+| fname   | lname    | PeopleTheyLike | PeopleLikeThem | difference |
++---------+----------+----------------+----------------+------------+
+| Linda   | Smith    |              6 |             14 |         -8 |
+| Tracy   | Kim      |              8 |              8 |          0 |
+| Shiela  | Jones    |              6 |              9 |         -3 |
+| Dinesh  | Kumar    |              5 |              9 |         -4 |
+| Paul    | Gompers  |              9 |              9 |          0 |
+| Andy    | Schultz  |             11 |             10 |          1 |
+| Lisa    | Apap     |              8 |              3 |          5 |
+| Jandy   | Nelson   |             20 |             19 |          1 |
+| Eric    | Tai      |              7 |             10 |         -3 |
+| Derek   | Lee      |              9 |              5 |          4 |
+| David   | Adams    |              8 |              9 |         -1 |
+| Steven  | Davis    |             14 |              9 |          5 |
+| Charles | Norris   |              1 |              8 |         -7 |
+| Susan   | Lee      |             10 |             10 |          0 |
+| Mark    | Schwartz |             10 |              9 |          1 |
+| Bruce   | Wilson   |              9 |              8 |          1 |
+| Arthur  | Pang     |              9 |              8 |          1 |
+| Ian     | Thornton |             17 |              9 |          8 |
+| George  | Andreou  |              6 |             11 |         -5 |
+| Michael | Woods    |              5 |              7 |         -2 |
+| David   | Shieber  |              5 |             10 |         -5 |
+| Stacy   | Prater   |             13 |              9 |          4 |
+| Mark    | Goldman  |              5 |             12 |         -7 |
+| Eric    | Pang     |              4 |             11 |         -7 |
+| Paul    | Brody    |             12 |             13 |         -1 |
+| Eric    | Rugh     |              9 |              7 |          2 |
+| Jun     | Han      |              4 |              5 |         -1 |
+| Lisa    | Cheng    |              4 |             15 |        -11 |
+| Sarah   | Smith    |              6 |             13 |         -7 |
+| Eric    | Brown    |             16 |              6 |         10 |
+| William | Simms    |             34 |              6 |         28 |
+| Eric    | Epp      |             11 |              7 |          4 |
+| Sarah   | Schmidt  |              8 |              6 |          2 |
++---------+----------+----------------+----------------+------------+
+--------------
+SELECT fname, lname, age, major
+FROM Student
+WHERE StuID NOT IN (
+    SELECT StuID
+    FROM Lives_in )
+--------------
+
++--------+---------+------+-------+
+| fname  | lname   | age  | major |
++--------+---------+------+-------+
+| Andy   | Schultz |   18 |   600 |
+| Arthur | Pang    |   18 |   600 |
+| Eric   | Pang    |   19 |   520 |
++--------+---------+------+-------+
+--------------
+SELECT DISTINCT T1.fname, T1.lname, T1.sex 
+FROM
+(SELECT fname, lname, sex
+FROM Student AS S INNER JOIN Enrolled_in AS E ON S.stuid = E.stuid INNER JOIN Course AS C ON E.cid = C.cid
+WHERE C.cid = '600.315' or C.cid = '600.415') AS T1
+INNER JOIN
+(SELECT fname, lname, sex
+FROM Student AS S INNER JOIN Enrolled_in AS E ON S.stuid = E.stuid INNER JOIN Course AS C ON E.cid = C.cid
+WHERE C.cid LIKE '600.1%' OR C.cid LIKE '600.2%') AS T2
+ON T1.fname = T2.fname AND T1.lname= T2.lname AND T1.sex=T2.sex
+--------------
+
++---------+----------+------+
+| fname   | lname    | sex  |
++---------+----------+------+
+| Andy    | Schultz  | M    |
+| Lisa    | Apap     | F    |
+| Steven  | Davis    | M    |
+| Charles | Norris   | M    |
+| Susan   | Lee      | F    |
+| Mark    | Schwartz | M    |
+| Michael | Woods    | M    |
+| David   | Shieber  | M    |
+| Paul    | Brody    | M    |
+| Eric    | Rugh     | M    |
+| Eric    | Brown    | M    |
+| William | Simms    | M    |
+| Eric    | Epp      | M    |
++---------+----------+------+
+--------------
+SELECT F.fname, F.lname, COUNT(S.stuid) AS Enrollment
+FROM Faculty AS F INNER JOIN Course AS C ON F.facid = C.instructor
+                  INNER JOIN Member_of AS M ON F.facid = M.facid
+                  INNER JOIN Department AS D ON M.dno = D.dno
+                  INNER JOIN Enrolled_in AS E ON E.cid = C.cid
+                  INNER JOIN Student AS S ON S.stuid = E.stuid
+WHERE M.appt_type = 'Primary' and D.DName = 'Computer Science'
+GROUP BY F.fname, F.lname
+ORDER BY Enrollment DESC
+--------------
+
++---------+--------------+------------+
+| fname   | lname        | Enrollment |
++---------+--------------+------------+
+| David   | Yarowsky     |         21 |
+| Arthur  | Delcher      |         19 |
+| Yair    | Amir         |         14 |
+| Michael | Goodrich     |         13 |
+| Stacey  | Jones        |         12 |
+| Baruch  | Awerbuch     |         11 |
+| Eric    | Brill        |          9 |
+| Ellie   | Angelopoulou |          8 |
+| Louis   | Beach        |          8 |
+| Gerald  | Masson       |          7 |
+| Russell | Taylor       |          5 |
+| Joanne  | Houlahan     |          4 |
+| Subodh  | Kumar        |          2 |
++---------+--------------+------------+
+--------------
+SELECT S.fname, S.lname, S.advisor, SUM(C.credits) AS totalCredit
+FROM Student AS S INNER JOIN Enrolled_in AS E ON S.stuid = E.stuid
+                  INNER JOIN Course AS C ON C.cid = E.cid
+GROUP BY S.fname, S.lname, S.advisor
+HAVING totalCredit > (
+ SELECT SUM(totalCredit)/COUNT(T.stuid)
+ FROM (
+   SELECT S.stuid, SUM(C.credits) AS totalCredit
+   FROM Student AS S INNER JOIN Enrolled_in AS E ON S.stuid = E.stuid
+                     INNER JOIN Course AS C ON C.cid = E.cid
+   GROUP BY S.stuid) AS T)
+--------------
+
++---------+----------+---------+-------------+
+| fname   | lname    | advisor | totalCredit |
++---------+----------+---------+-------------+
+| Bruce   | Wilson   |    1148 |          19 |
+| Charles | Norris   |    8741 |          21 |
+| David   | Adams    |    1148 |          20 |
+| David   | Shieber  |    8722 |          24 |
+| Derek   | Lee      |    2192 |          23 |
+| Dinesh  | Kumar    |    8423 |          19 |
+| Eric    | Tai      |    2192 |          26 |
+| George  | Andreou  |    8722 |          23 |
+| Jun     | Han      |    2311 |          20 |
+| Lisa    | Apap     |    8918 |          19 |
+| Lisa    | Cheng    |    2311 |          26 |
+| Mark    | Goldman  |    7134 |          26 |
+| Mark    | Schwartz |    2192 |          23 |
+| Michael | Woods    |    8722 |          27 |
+| Paul    | Brody    |    8723 |          19 |
+| Stacy   | Prater   |    7271 |          27 |
++---------+----------+---------+-------------+
+--------------
+SELECT S.fname, S.lname, S.age
+FROM Student AS S
+WHERE S.age - 
+  (SELECT STD(age)
+   FROM Student) >
+  (SELECT SUM(S1.age)/COUNT(S1.stuid)
+  FROM Student AS S1)
+--------------
+
++-------+---------+------+
+| fname | lname   | age  |
++-------+---------+------+
+| Paul  | Gompers |   26 |
+| Bruce | Wilson  |   27 |
+| Sarah | Schmidt |   26 |
++-------+---------+------+
+--------------
+SELECT S.fname, S.lname, S.age
+FROM Student AS S
+  INNER JOIN Minor_in AS M ON S.stuid= M.stuid
+  INNER JOIN Enrolled_in AS E ON E.stuid = S.stuid
+  INNER JOIN Course AS C ON E.cid = C.cid
+  INNER JOIN Faculty AS F ON F.facid = C.Instructor
+  INNER JOIN Member_of AS Mem ON Mem.facid = F.facid
+  INNER JOIN Department AS D ON Mem.dno = D.dno
+  INNER JOIN Department AS DS ON DS.dno = S.major
+WHERE
+  S.sex = 'F' AND
+  DS.division = 'EN'AND
+  F.sex = 'F' AND
+  Mem.appt_type = 'Primary' AND
+  D.division = 'EN'
+--------------
+
+--------------
+SELECT S.fname, S.lname, S.stuid
+FROM Student AS S
+WHERE NOT EXISTS ( SELECT C.cid
+                   FROM Course AS C INNER JOIN Faculty AS F ON C.Instructor = F.facid
+                   WHERE F.fname = 'Paul' AND F.lname= 'Smolensky' AND
+                         C.cid NOT IN ( SELECT E.cid
+                                        FROM Enrolled_in AS E
+                                        WHERE S.stuid = E.stuid))
+--------------
+
+--------------
+SELECT DISTINCT S.fname, S.lname, S.stuid
+FROM Student AS S INNER JOIN Enrolled_in AS E ON S.stuid = E.stuid
+WHERE E.cid IN (
+ SELECT ET.cid
+ FROM 
+   (SELECT S0.stuid 
+   FROM Student AS S0 INNER JOIN Enrolled_in AS E0 ON S0.stuid = E0.stuid
+   WHERE E0.cid IN (SELECT EL.cid
+                   FROM Student AS SL INNER JOIN Enrolled_in AS EL ON SL.stuid = EL.stuid
+                   WHERE SL.fname = 'Linda' AND SL.lname = 'Smith')) AS T1
+   INNER JOIN
+   Enrolled_in AS ET ON T1.stuid = ET.stuid
+ ) AND S.fname <> 'Linda' AND S.lname <> 'Smith'
+--------------
+
++---------+----------+-------+
+| fname   | lname    | stuid |
++---------+----------+-------+
+| Tracy   | Kim      |  1002 |
+| Shiela  | Jones    |  1003 |
+| Dinesh  | Kumar    |  1004 |
+| Paul    | Gompers  |  1005 |
+| Andy    | Schultz  |  1006 |
+| Lisa    | Apap     |  1007 |
+| Jandy   | Nelson   |  1008 |
+| Eric    | Tai      |  1009 |
+| Derek   | Lee      |  1010 |
+| David   | Adams    |  1011 |
+| Steven  | Davis    |  1012 |
+| Charles | Norris   |  1014 |
+| Susan   | Lee      |  1015 |
+| Mark    | Schwartz |  1016 |
+| Bruce   | Wilson   |  1017 |
+| Michael | Leighton |  1018 |
+| Arthur  | Pang     |  1019 |
+| Ian     | Thornton |  1020 |
+| George  | Andreou  |  1021 |
+| Michael | Woods    |  1022 |
+| David   | Shieber  |  1023 |
+| Stacy   | Prater   |  1024 |
+| Mark    | Goldman  |  1025 |
+| Eric    | Pang     |  1026 |
+| Paul    | Brody    |  1027 |
+| Eric    | Rugh     |  1028 |
+| Jun     | Han      |  1029 |
+| Lisa    | Cheng    |  1030 |
+| Eric    | Brown    |  1032 |
+| William | Simms    |  1033 |
+| Eric    | Epp      |  1034 |
+| Sarah   | Schmidt  |  1035 |
++---------+----------+-------+
+--------------
+SELECT T1.cname, T1.instructor, T1.AAbove, T2.EnrollNum, T1.AAbove/T2.EnrollNum
+FROM
+  (SELECT C.cid, C.cname, C.instructor, COUNT(E.grade) AS AAbove
+   FROM Student AS S INNER JOIN Enrolled_in AS E ON S.stuid = E.stuid
+                  INNER JOIN Course AS C ON C.cid = E.cid
+   WHERE E.grade = 'A' OR E.grade = 'A+' OR E.grade = 'A-' 
+   GROUP BY C.cid, C.cname, C.instructor) AS T1
+  INNER JOIN
+  (SELECT C.cid, COUNT(E.stuid) AS EnrollNum
+   FROM Student AS S INNER JOIN Enrolled_in AS E ON S.stuid = E.stuid
+                  INNER JOIN Course AS C ON C.cid = E.cid
+   GROUP BY C.cid, C.cname, C.instructor) AS T2
+  ON T1.cid = T2.cid
+--------------
+
++--------------------------------------+------------+--------+-----------+------------------------+
+| cname                                | instructor | AAbove | EnrollNum | T1.AAbove/T2.EnrollNum |
++--------------------------------------+------------+--------+-----------+------------------------+
+| SOUND STRUCTURES IN NATURAL LANGUAGE |       4432 |      2 |         3 |                 0.6667 |
+| THE HISTORY OF ROMANCE LANGUAGES     |       4432 |      1 |         2 |                 0.5000 |
+| COMP. MODELS OF SENTENCE PROCESSING  |       5718 |      2 |         2 |                 1.0000 |
+| CIRCUITS                             |       9210 |      2 |         5 |                 0.4000 |
+| ECE LABORATORY                       |       1823 |      1 |         3 |                 0.3333 |
+| MICROPROCESSOR LAB I                 |       9824 |      2 |         3 |                 0.6667 |
+| CONTROL SYSTEMS                      |       6925 |      2 |         3 |                 0.6667 |
+| LINEAR ALGEBRA AND DIFFERENTIAL EQNS |       6541 |      1 |         3 |                 0.3333 |
+| PROBABILITY AND STATISTICS           |       8102 |      2 |         3 |                 0.6667 |
+| APPLIED STATISTICS AND DATA ANALYSIS |       1177 |      1 |         6 |                 0.1667 |
+| INTRODUCTION TO PROBABILITY          |       2738 |      5 |        13 |                 0.3846 |
+| COMBINATORIAL ANALYSIS               |       8772 |      3 |         6 |                 0.5000 |
+| PROBABILITY THEORY I                 |       2738 |      2 |         3 |                 0.6667 |
+| STATISTICAL INFERENCE                |       6182 |      1 |         1 |                 1.0000 |
+| COMBINATORIAL ANALYSIS               |       8772 |      1 |         3 |                 0.3333 |
+| NUMERICAL ANALYSIS                   |       6541 |      2 |         4 |                 0.5000 |
+| INTRODUCTION TO COMPUTER SCIENCE     |       4230 |      1 |         2 |                 0.5000 |
+| INTRO TO PROGRAMMING IN JAVA         |       1193 |      3 |        12 |                 0.2500 |
+| INTRO TO PROGRAMMING IN C/C++        |       4230 |      1 |         2 |                 0.5000 |
+| EXPLORING THE INTERNET               |       6112 |      3 |         6 |                 0.5000 |
+| UNIX SYSTEMS PROGRAMMING             |       6112 |      1 |         2 |                 0.5000 |
+| DATA STRUCTURES in JAVA              |       1121 |      8 |        11 |                 0.7273 |
+| MULTIMEDIA COMPUTING                 |       9826 |      2 |         5 |                 0.4000 |
+| SUPERCOMPUTING                       |       9826 |      6 |        14 |                 0.4286 |
+| DATABASE SYSTEMS                     |       2192 |      6 |        14 |                 0.4286 |
+| COMPUTER SYSTEM FUNDAMENTALS         |       1148 |      5 |         7 |                 0.7143 |
+| DISTRIBUTED SYSTEMS                  |       8918 |      4 |         9 |                 0.4444 |
+| DATABASE SYSTEMS                     |       2192 |      2 |         7 |                 0.2857 |
+| DISTRIBUTED SYSTEMS                  |       8918 |      2 |         5 |                 0.4000 |
+| QUANTITATIVE MEDICAL COMPUTING       |       7723 |      2 |         5 |                 0.4000 |
+| COMPUTER VISION                      |       8114 |      3 |         8 |                 0.3750 |
+| ALGORITHMS I                         |       7712 |      4 |        11 |                 0.3636 |
+| INTRO TO NATURAL LANGUAGE PROCESSING |       7792 |      3 |         9 |                 0.3333 |
++--------------------------------------+------------+--------+-----------+------------------------+
+--------------
+SELECT TT2.cname, TT2.instructor, TT2.BBelow, TT2.EnrollNum, TT2.Ratio
+FROM (
+SELECT T1.BBelow/T2.EnrollNum AS Ratio
+FROM
+  (SELECT C.cid, C.cname, C.instructor, COUNT(E.grade) AS BBelow
+   FROM Student AS S INNER JOIN Enrolled_in AS E ON S.stuid = E.stuid
+                  INNER JOIN Course AS C ON C.cid = E.cid
+   WHERE E.grade = 'C+' OR E.grade = 'C' OR E.grade = 'C-' OR E.grade = 'D+' OR E.grade = 'D-' OR E.grade = 'D' OR E.grade = 'F' 
+   GROUP BY C.cid, C.cname, C.instructor) AS T1
+  INNER JOIN
+  (SELECT C.cid, COUNT(E.stuid) AS EnrollNum
+   FROM Student AS S INNER JOIN Enrolled_in AS E ON S.stuid = E.stuid
+                  INNER JOIN Course AS C ON C.cid = E.cid
+   GROUP BY C.cid, C.cname, C.instructor) AS T2
+  ON T1.cid = T2.cid
+ORDER BY Ratio DESC LIMIT 0,1
+) AS TT1 
+INNER JOIN 
+(
+SELECT T1.cname, T1.instructor, T1.BBelow, T2.EnrollNum, T1.BBelow/T2.EnrollNum AS Ratio
+FROM
+  (SELECT C.cid, C.cname, C.instructor, COUNT(E.grade) AS BBelow
+   FROM Student AS S INNER JOIN Enrolled_in AS E ON S.stuid = E.stuid
+                  INNER JOIN Course AS C ON C.cid = E.cid
+   WHERE E.grade = 'C+' OR E.grade = 'C' OR E.grade = 'C-' OR E.grade = 'D+' OR E.grade = 'D-' OR E.grade = 'D' OR E.grade = 'F' 
+   GROUP BY C.cid, C.cname, C.instructor) AS T1
+  INNER JOIN
+  (SELECT C.cid, COUNT(E.stuid) AS EnrollNum
+   FROM Student AS S INNER JOIN Enrolled_in AS E ON S.stuid = E.stuid
+                  INNER JOIN Course AS C ON C.cid = E.cid
+   GROUP BY C.cid, C.cname, C.instructor) AS T2
+   ON T1.cid = T2.cid
+) AS TT2
+ON TT2.Ratio = TT1.Ratio
+--------------
+
++-----------------------------------------+------------+--------+-----------+--------+
+| cname                                   | instructor | BBelow | EnrollNum | Ratio  |
++-----------------------------------------+------------+--------+-----------+--------+
+| RESEARCH SEMINAR IN COGNITIVE PROCESSES |       9011 |      2 |         2 | 1.0000 |
++-----------------------------------------+------------+--------+-----------+--------+
+--------------
+SELECT AVG(SS.age)
+FROM 
+  (SELECT S.stuid, COUNT(P.actid) AS Times
+  FROM Student AS S INNER JOIN Participates_in AS P ON S.stuid = P.stuid
+  GROUP BY S.stuid) AS T1
+  INNER JOIN
+  Student AS SS ON SS.stuid = T1.stuid
+WHERE T1.Times > 2
+--------------
+
++-------------+
+| AVG(SS.age) |
++-------------+
+|     20.1818 |
++-------------+
+--------------
+(SELECT S.fname, S.lname
+   FROM Student AS S INNER JOIN Participates_in AS P ON S.stuid = P.stuid
+                     INNER JOIN Activity AS A ON A.actid = P.actid
+   WHERE A.activity_name = 'Extreme Canasta')
+   UNION
+    (SELECT F.fname, F.lname
+   FROM Faculty AS F INNER JOIN Faculty_Participates_in AS FP ON F.facid = FP.facid
+                     INNER JOIN Activity AS A ON A.actid = FP.actid
+   WHERE A.activity_name = 'Extreme Canasta')
+--------------
+
++--------+--------------+
+| fname  | lname        |
++--------+--------------+
+| George | Andreou      |
+| David  | Shieber      |
+| Ellie  | Angelopoulou |
+| Robert | Frank        |
+| Cheng  | Cheng        |
++--------+--------------+
+--------------
+SELECT DISTINCT S1.fname AS Name1F, S1.lname AS Name1L, S2.fname AS Name2F, S2.lname AS Name2L
+FROM (Student AS S1 INNER JOIN Lives_in AS L1 ON S1.stuid = L1.stuid ) 
+     INNER JOIN
+     Lives_in AS L2  ON L1.DormID = L2.DormID AND L1.Room_number = L2.Room_number INNER JOIN Student AS S2 ON S2.stuid = L2.stuid 
+WHERE S1.stuid > S2.stuid
+--------------
+
++--------+---------+--------+----------+
+| Name1F | Name1L  | Name2F | Name2L   |
++--------+---------+--------+----------+
+| Eric   | Brown   | Linda  | Smith    |
+| Sarah  | Smith   | Tracy  | Kim      |
+| Sarah  | Schmidt | Shiela | Jones    |
+| Steven | Davis   | Paul   | Gompers  |
+| Eric   | Tai     | Paul   | Gompers  |
+| Susan  | Lee     | Derek  | Lee      |
+| George | Andreou | Ian    | Thornton |
+| Mark   | Goldman | David  | Shieber  |
+| Jandy  | Nelson  | Shiela | Jones    |
+| Steven | Davis   | Eric   | Tai      |
++--------+---------+--------+----------+
+--------------
+DROP TABLE IF EXISTS Baltimore_distance
+--------------
+
+--------------
+CREATE TABLE IF NOT EXISTS Baltimore_distance(
+         City1_code char(3) DEFAULT NULL, 
+         City2_code char(3) DEFAULT NULL, 
+         Distance  int(11) DEFAULT NULL)
+--------------
+
+--------------
+INSERT INTO Baltimore_distance(City1_code, City2_code, Distance)
+         SELECT DISTINCT C1.city2_code, C2.city2_code, C1.distance + C2.distance
+         FROM 
+             (SELECT D.city2_code, D.distance
+              FROM Direct_distance AS D
+              WHERE city1_code = 'BAL') AS C1 
+              INNER JOIN 
+             (SELECT D.city2_code, D.distance
+              FROM Direct_distance AS D
+              WHERE city1_code = 'BAL') AS C2
+         WHERE C1.city2_code <> C2.city2_code
+--------------
+
+--------------
+DROP TABLE IF EXISTS Rectangular_distance
+--------------
+
+--------------
+CREATE TABLE IF NOT EXISTS Rectangular_distance(
+         City1_code char(3) DEFAULT NULL, 
+         City2_code char(3) DEFAULT NULL, 
+         Distance  int(11) DEFAULT NULL)
+--------------
+
+--------------
+INSERT INTO Rectangular_distance(City1_code, City2_code, Distance)
+         SELECT DISTINCT C1.city_code, C2.city_code, 
+                SQRT(POWER((70*C1.latitude-70*C2.latitude),2) + POWER((70*C1.longitude-70*C2.longitude),2))
+         FROM 
+              (SELECT city_code,latitude,longitude 
+               FROM City) AS C1 
+               JOIN 
+              (SELECT city_code,latitude,longitude 
+               FROM City) AS C2
+         WHERE C1.city_code<>C2.city_code
+--------------
+
+--------------
+DROP TABLE IF EXISTS All_distance
+--------------
+
+--------------
+CREATE TABLE IF NOT EXISTS All_distance(
+         City1_code char(3) DEFAULT NULL, 
+         City2_code char(3) DEFAULT NULL, 
+         Direct_distance int(11) DEFAULT NULL,
+         Baltimore_distance int(11) DEFAULT NULL,
+         Rectangular_distance int(11) DEFAULT NULL)
+--------------
+
+--------------
+INSERT INTO All_distance(City1_code, City2_code, Direct_distance, Baltimore_distance, Rectangular_distance)
+         SELECT B.City1_code, B.city2_code, D.distance, B.distance, R.distance
+         FROM Rectangular_distance AS R JOIN Baltimore_distance AS B ON R.city1_code = B.city1_code AND R.city2_code = B.city2_code JOIN Direct_distance AS D ON D.city1_code = B.city1_code AND D.city2_code = B.city2_code
+--------------
+
+--------------
+DROP TABLE IF EXISTS Best_distance
+--------------
+
+--------------
+CREATE TABLE IF NOT EXISTS Best_distance(
+         City1_code char(3) DEFAULT NULL, 
+         City2_code char(3) DEFAULT NULL,           
+         Distance int(11) DEFAULT NULL)
+--------------
+
+--------------
+INSERT INTO Best_distance (City1_code, City2_code, Distance)
+         SELECT T.city1_code,T.city2_code,LEAST(T.direct_distance,T.baltimore_distance,T.rectangular_distance) AS distance
+         FROM ( SELECT A.city1_code, A.city2_code,IF(ISNULL(A.direct_distance),99999999,A.direct_distance) AS direct_distance,         A.baltimore_distance,A.rectangular_distance
+                FROM All_distance AS A) AS T
+--------------
+
+--------------
+SELECT A.activity_name, COUNT(P.stuid) AS Popular
+FROM Activity AS A INNER JOIN Participates_in AS P ON A.actid= P.actid
+                   INNER JOIN Student AS S ON S.stuid = P.stuid
+GROUP BY A.activity_name
+ORDER BY Popular DESC LIMIT 0,1
+--------------
+
++---------------+---------+
+| activity_name | Popular |
++---------------+---------+
+| Football      |      14 |
++---------------+---------+
+--------------
+SELECT A0.activity_name
+FROM Activity AS A0
+WHERE A0.actid NOT IN ( SELECT A1.actid
+                        FROM Student AS S INNER JOIN Participates_in AS P ON S.stuid = P.stuid
+                        INNER JOIN Activity AS A1 ON A1.actid = P.actid)
+      AND A0.actid IN ( SELECT A2.actid
+                        FROM Faculty AS F INNER JOIN Faculty_Participates_in AS FP ON F.facid = FP.facid
+                       INNER JOIN Activity AS A2 ON A2.actid = FP.actid)
+--------------
+
++----------------+
+| activity_name  |
++----------------+
+| Square Dancing |
++----------------+
+--------------
+SELECT DISTINCT S.fname, S.lname, S.stuid
+FROM Student AS S INNER JOIN Enrolled_in AS E ON S.stuid = E.stuid
+WHERE E.cid IN (
+ SELECT E1.cid
+ FROM Enrolled_in AS E1 INNER JOIN Student AS S1 ON S1.stuid = E1.stuid INNER JOIN Lives_in AS L ON L.stuid = S1.stuid
+ WHERE L.DormID IN (
+    SELECT L2.dormid
+    FROM Lives_in AS L2 INNER JOIN Student AS S2 ON S2.stuid = L2.stuid INNER JOIN City AS C ON C.City_code = S2.city_code
+    WHERE C.City_name = 'PA'AND L2.room_number = L.room_number))
+--------------
+
+--------------
+SELECT DISTINCT S1.fname AS Name1F, S1.lname AS Name1L, S2.fname AS Name2F, S2.lname AS Name2L
+FROM (Student AS S1 INNER JOIN Lives_in AS L1 ON S1.stuid = L1.stuid INNER JOIN City AS C1 ON S1.city_code = C1.city_code) 
+     INNER JOIN Lives_in AS L2  ON L1.DormID = L2.DormID AND L1.Room_number = L2.Room_number 
+     INNER JOIN Student AS S2 ON S2.stuid = L2.stuid 
+     INNER JOIN City AS C2 ON S2.city_code = C2.city_code
+WHERE S1.stuid > S2.stuid AND C1.country <> C2.country
+--------------
+
++--------+--------+--------+---------+
+| Name1F | Name1L | Name2F | Name2L  |
++--------+--------+--------+---------+
+| Susan  | Lee    | Derek  | Lee     |
+| Steven | Davis  | Paul   | Gompers |
+| Steven | Davis  | Eric   | Tai     |
+| Sarah  | Smith  | Tracy  | Kim     |
++--------+--------+--------+---------+
+--------------
+SELECT S.Major, COUNT(A.actid)/COUNT(DISTINCT S.stuid) AS AvgActivity
+FROM Student AS S INNER JOIN Participates_in AS P ON S.stuid = P.stuid INNER JOIN Activity AS A ON A.actid = P.actid 
+GROUP BY S.Major
+HAVING COUNT(DISTINCT S.stuid) >1
+--------------
+
++-------+-------------+
+| Major | AvgActivity |
++-------+-------------+
+|    50 |      3.5000 |
+|   520 |      2.0000 |
+|   540 |      2.5000 |
+|   550 |      1.3333 |
+|   600 |      2.4444 |
++-------+-------------+
+--------------
+SELECT DISTINCT F1.fname, F1.lname
+FROM Faculty AS F1 INNER JOIN Member_of AS Mem ON Mem.facid = F1.facid INNER JOIN Student AS S1 ON F1.facid = S1.advisor INNER JOIN Enrolled_in AS E1 ON S1.stuid = E1.stuid
+WHERE E1.cid IN ( SELECT E2.cid
+                  FROM Enrolled_in AS E2 INNER JOIN Student AS S2 ON E2.stuid = S2.stuid INNER JOIN Lives_in AS L2 ON L2.stuid = S2.stuid
+                  WHERE L2.dormid IN ( SELECT L3.dormid
+                                       FROM Lives_in AS L3 INNER JOIN Student AS S3 ON S3.stuid = L3.stuid INNER JOIN Minor_in AS M ON S3.stuid = M.stuid
+                                       WHERE L2.room_number = L3.room_number AND (Mem.DNO = M.DNO OR Mem.DNO = S3.Major) 
+                                      )
+                )
+--------------
+
++-----------+--------------+
+| fname     | lname        |
++-----------+--------------+
+| Michael   | Goodrich     |
+| Baruch    | Awerbuch     |
+| Eric      | Brill        |
+| Subodh    | Kumar        |
+| Gerald    | Masson       |
+| Yair      | Amir         |
+| Rao       | Kosaraju     |
+| David     | Yarowsky     |
+| Russell   | Taylor       |
+| Steven    | Salzberg     |
+| Lawrence  | Wolff        |
+| Frederick | Jelinek      |
+| Gert      | Cauwenberghs |
+| John      | Goutsias     |
+| Andreas   | Andreou      |
+| Carey     | Priebe       |
+| Lenore    | Cowen        |
++-----------+--------------+
+--------------
+SELECT S.fname, S.lname, F.fname, F.lname, S.Major, SUM(C.credits) AS TotalCredit, AvgCredit
+FROM Student AS S INNER JOIN Enrolled_in AS E ON S.stuid = E.stuid INNER JOIN Course AS C ON E.cid = C.cid
+               INNER JOIN Faculty AS F ON F.facid = S.advisor
+               INNER JOIN
+                       ( SELECT S1.Major, SUM(C1.credits)/COUNT(DISTINCT S1.stuid) AS AvgCredit
+                       FROM Student AS S1 INNER JOIN Enrolled_in AS E1 ON S1.stuid = E1.stuid INNER JOIN Course AS C1 ON E1.cid = C1.cid 
+                       GROUP BY S1.Major) AS T1 ON T1.Major = S.Major
+GROUP BY S.fname, S.lname, F.fname, F.lname
+HAVING TotalCredit > AvgCredit
+--------------
+
++---------+----------+--------+--------------+-------+-------------+-----------+
+| fname   | lname    | fname  | lname        | Major | TotalCredit | AvgCredit |
++---------+----------+--------+--------------+-------+-------------+-----------+
+| Bruce   | Wilson   | Gerald | Masson       |   600 |          19 |   17.7222 |
+| Charles | Norris   | Steven | Salzberg     |   600 |          21 |   17.7222 |
+| David   | Adams    | Gerald | Masson       |   600 |          20 |   17.7222 |
+| David   | Shieber  | Gert   | Cauwenberghs |   520 |          24 |   20.5000 |
+| Derek   | Lee      | David  | Yarowsky     |   600 |          23 |   17.7222 |
+| Dinesh  | Kumar    | Subodh | Kumar        |   600 |          19 |   17.7222 |
+| Eric    | Tai      | David  | Yarowsky     |   600 |          26 |   17.7222 |
+| George  | Andreou  | Gert   | Cauwenberghs |   520 |          23 |   20.5000 |
+| Lisa    | Apap     | Yair   | Amir         |   600 |          19 |   17.7222 |
+| Lisa    | Cheng    | Carey  | Priebe       |   550 |          26 |   17.0000 |
+| Mark    | Goldman  | John   | Goutsias     |   520 |          26 |   20.5000 |
+| Mark    | Schwartz | David  | Yarowsky     |   600 |          23 |   17.7222 |
++---------+----------+--------+--------------+-------+-------------+-----------+
+--------------
+SELECT C.cname, F.fname, F.lname, COUNT(E.stuid) AS EnrollmentNum
+FROM Course AS C INNER JOIN Enrolled_in AS E ON C.cid = E.cid
+                 INNER JOIN Faculty AS F ON F.facid = C.instructor
+GROUP BY C.cname, F.fname, F.lname
+HAVING EnrollmentNum >    ( SELECT SUM(EnrollPerCourse)
+                           FROM Course AS C1
+                                INNER JOIN ( SELECT C2.cname, COUNT(E2.stuid) AS EnrollPerCourse
+                                             FROM Enrolled_in AS E2 INNER JOIN Course AS C2 ON E2.cid = C2.cid
+                                             GROUP BY C2.cid) AS T1 ON T1.cname = C1.cname
+                          )/ 
+                          ( SELECT COUNT(DISTINCT E0.cid)
+                            FROM Enrolled_in AS E0
+                          )
+--------------
+
++--------------------------------------+---------+--------------+---------------+
+| cname                                | fname   | lname        | EnrollmentNum |
++--------------------------------------+---------+--------------+---------------+
+| ALGORITHMS I                         | Baruch  | Awerbuch     |            11 |
+| COMBINATORIAL ANALYSIS               | Lenore  | Cowen        |             9 |
+| COMPUTER SYSTEM FUNDAMENTALS         | Gerald  | Masson       |             7 |
+| COMPUTER VISION                      | Ellie   | Angelopoulou |             8 |
+| DATA STRUCTURES in JAVA              | Michael | Goodrich     |            11 |
+| DATABASE SYSTEMS                     | David   | Yarowsky     |            21 |
+| DISTRIBUTED SYSTEMS                  | Yair    | Amir         |            14 |
+| INTRO TO NATURAL LANGUAGE PROCESSING | Eric    | Brill        |             9 |
+| INTRO TO PROGRAMMING IN JAVA         | Stacey  | Jones        |            12 |
+| INTRODUCTION TO PROBABILITY          | James   | Fill         |            13 |
+| SUPERCOMPUTING                       | Arthur  | Delcher      |            14 |
++--------------------------------------+---------+--------------+---------------+
+--------------
+SELECT F.fname, F.lname, F.Room, F.Building
+FROM Faculty AS F INNER JOIN Member_of AS M ON F.facid = M.facid INNER JOIN Department AS D ON M.dno = D.dno
+WHERE M.appt_type = 'Secondary' AND D.dname = 'Computer Science'
+            AND F.building NOT IN (SELECT F1.building
+                       FROM  Faculty AS F1 INNER JOIN Member_of AS M1 ON F1.facid = M1.facid INNER JOIN Department AS D1 ON M1.dno = D1.dno
+                       WHERE F1.building = 'NEB')
+--------------
+
++-----------+---------+------+----------+
+| fname     | lname   | Room | Building |
++-----------+---------+------+----------+
+| Frederick | Jelinek | 119  | Barton   |
+| Michael   | Brent   | 288  | Krieger  |
++-----------+---------+------+----------+
+--------------
+SELECT COUNT(S.stuid)
+FROM Student AS S INNER JOIN Department AS D ON S.major = D.dno
+                  INNER JOIN Preferences AS PF ON PF.stuid = S.stuid
+WHERE D.dname = 'Computer Science' AND PF.smoking = 'Yes'
+      AND S.stuid NOT IN (SELECT S1.stuid 
+                      FROM Student AS S1 INNER JOIN Likes AS LK ON LK.wholikes = S1.stuid
+                                         INNER JOIN Student AS S2 ON LK.whoisliked = S2.stuid
+                      WHERE S2.stuid IN( SELECT stuid
+                                         FROM Student)
+                         )
+--------------
+
++----------------+
+| COUNT(S.stuid) |
++----------------+
+|              1 |
++----------------+

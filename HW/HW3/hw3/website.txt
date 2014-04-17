@@ -1,0 +1,3 @@
+chmod 701 ~jwheeler
+chmod 701 public_html
+chmod 704 index.html

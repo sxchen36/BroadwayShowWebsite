@@ -1,0 +1,3 @@
+
+12.
+select StuID, sum(gradepoint)/count(StuID) as GPA from Student natural join Enrolled_in, Gradeconversion as GC where Grade = GC.lettergrade  and StuID in ( Select StuID from Student natural join Enrolled_in where Grade = 'A') GROUP BY StuID Having GPA > 3.3;
